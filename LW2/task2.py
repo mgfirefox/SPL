@@ -27,7 +27,7 @@ def start():
             element = [random.randint(-1000000000, 1000000000) for _ in range(10)]
         elif user_choice == 3:
             element = random.randint(0, 1000000000)
-        elif user_choice == 4:
+        else:
             element = "afj4848nje38f8uc4j4if88d3j4nf88r4"
 
         func(element)
