@@ -30,11 +30,11 @@ def start():
         else:
             element = "afj4848nje38f8uc4j4if88d3j4nf88r4"
 
-        func(element)
+        function(element)
         break
 
 
-def func(element):
+def function(element):
     if isinstance(element, tuple):
         print(element)
 
@@ -89,3 +89,5 @@ def func(element):
             i += 1
 
         print("Сумма чисел в строке равна", numbers_sum)
+    else:
+        print("Передан аргумент неожиданного типа")
