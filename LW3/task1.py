@@ -1,5 +1,5 @@
 def start():
-    file1 = open("file1.txt", 'w+')
+    file1 = open("file1.txt", "w+", encoding="utf-8")
 
     while True:
         string = input("Введите строку (для выхода введите пустую строку): ")
@@ -10,7 +10,7 @@ def start():
             file1.write(string + '\n')
 
     file1.seek(0)
-    file2 = open("file2.txt", "w+")
+    file2 = open("file2.txt", "w+", encoding="utf-8")
 
     for string in file1:
         if string[:-1].isalpha() and len(string.split()) == 1:
@@ -34,6 +34,6 @@ def start():
     elif longest_words[0] != "":
         print("Самое длинное слово:", longest_words[0])
     else:
-        print("Файл пуст. Длинное слово не найдено")
+        print("Длинное слово не найдено: не была введена строка с одним словом")
 
     file2.close()
