@@ -1,7 +1,7 @@
 def start():
     subjects = {}
 
-    with open("subjects.txt") as file:
+    with open("subjects.txt", encoding="utf-8") as file:
         for line in file:
             subject_data = line[:-1].split()
 
