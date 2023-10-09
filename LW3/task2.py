@@ -3,7 +3,7 @@ def start():
     is_cheap_jewelry_found = False
     jewelry = {}
 
-    with open("jewelry.txt") as file:
+    with open("jewelry.txt", encoding="utf-8") as file:
         for line in file:
             jewelry_data = line[:-1].split()
             jewelry[jewelry_data[0]] = float(jewelry_data[1])
