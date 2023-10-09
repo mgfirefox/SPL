@@ -13,8 +13,8 @@ def start():
                 if not is_cheap_jewelry_found:
                     is_cheap_jewelry_found = True
                     print("Ювелирные украшения дешевле 100 рублей:")
-                else:
-                    print(jewelry_data[0], '—', jewelry_data[1])
+
+                print(jewelry_data[0], '—', jewelry_data[1])
 
     if len(jewelry) == 0:
         print("Файл пуст")
