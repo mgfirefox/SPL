@@ -47,6 +47,4 @@ class Employee:
 
     @staticmethod
     def input_full_name():
-        full_name = input("Введите ФИО работника: ")
-
-        return full_name
+        return input("Введите ФИО работника: ")
