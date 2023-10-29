@@ -1,7 +1,7 @@
 class Employee:
-    def __init__(self, id: int = None, full_name: str = None):
-        self._id = id or 0
-        self._full_name = full_name or ""
+    def __init__(self, id: int = 0, full_name: str = ""):
+        self._id = id
+        self._full_name = full_name
 
     def __str__(self):
         return f"{self._id} {self._full_name}"
