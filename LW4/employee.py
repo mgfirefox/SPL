@@ -19,8 +19,8 @@ class Employee:
         self._full_name = full_name
 
     def input(self):
-        self._id = self.input_id()
-        self._full_name = self.input_full_name()
+        self._id = Employee.input_id()
+        self._full_name = Employee.input_full_name()
 
     @classmethod
     def create(cls):
