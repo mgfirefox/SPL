@@ -47,8 +47,6 @@ class Employee:
 
     @staticmethod
     def input_full_name():
-        while True:
-            full_name = input("Введите ФИО работника: ")
-            break
+        full_name = input("Введите ФИО работника: ")
 
         return full_name
