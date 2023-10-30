@@ -181,8 +181,8 @@ class Library:
 
 
 class Department:
-    def __init__(self, name: str = "", books: list = None):
-        self.__name = name
+    def __init__(self, name: str = None, books: list = None):
+        self.__name = name or ""
         self.__books = books or []
 
     def __str__(self):
@@ -245,9 +245,9 @@ class Department:
 
 
 class Book:
-    def __init__(self, name: str = "", author_initials: str = ""):
-        self.__name = name
-        self.__author_initials = author_initials
+    def __init__(self, name: str = None, author_initials: str = None):
+        self.__name = name or ""
+        self.__author_initials = author_initials or ""
 
     def __str__(self):
         return f"{self.__name} {self.__author_initials}"
