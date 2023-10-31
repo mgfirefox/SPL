@@ -8,14 +8,18 @@ class Library:
 
         while True:
             try:
-                user_choice = int(input('''1. Вывести отделы
-2. Вывести книги отдела
-3. Добавить отдел
-4. Добавить книги в отдел
-5. Удалить отдел
-6. Удалить книги отдела
-7. Отредактировать отдел
+                user_choice = int(input('''   Отделы
+1. Вывести отделы
+2. Добавить отдел
+3. Удалить отдел
+4. Отредактировать отдел
+
+   Книги
+5. Вывести книги отдела
+6. Добавить книги в отдел
+7. Удалить книги отдела
 8. Отредактировать книгу отдела
+
 9. Записать информацию в файл
 0. Выход
 '''))
@@ -32,17 +36,17 @@ class Library:
             elif user_choice == 1:
                 Library.print_departments()
             elif user_choice == 2:
-                Library.print_books()
-            elif user_choice == 3:
                 Library.add_department()
-            elif user_choice == 4:
-                Library.add_books()
-            elif user_choice == 5:
+            elif user_choice == 3:
                 Library.remove_department()
-            elif user_choice == 6:
-                Library.remove_books()
-            elif user_choice == 7:
+            elif user_choice == 4:
                 Library.edit_department()
+            elif user_choice == 5:
+                Library.print_books()
+            elif user_choice == 6:
+                Library.add_books()
+            elif user_choice == 7:
+                Library.remove_books()
             elif user_choice == 8:
                 Library.edit_book()
             else:
