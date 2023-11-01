@@ -1,6 +1,6 @@
 class List:
-    def __init__(self):
-        self.__list = []
+    def __init__(self, list: list = None):
+        self.__list = list or []
 
     def __str__(self):
         return str(self.__list)
@@ -26,7 +26,7 @@ class List:
         return self
 
     def copy(self):
-        return self.__list.copy()
+        return List(self.__list.copy())
 
     def append(self, element):
         self.__list.append(element)
