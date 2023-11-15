@@ -18,7 +18,11 @@ def start():
         n_rooms_flats_amount[int(rooms_item)] += 1
 
     each_district_flats_amount = pandas.pivot_table(
-        data, index="DistrictId", columns="Rooms", aggfunc="count", fill_value=0).iloc[:, 0:7].copy()
+        data, index="DistrictId", columns="Rooms", aggfunc="count", fill_value=0).iloc[:, 0:7]
 
+    print(f"Количество n-комнатных квартир: {n_rooms_flats_amount}")
+    print()
+    print(f'Сводная таблица "районы-комнаты" со значением количества квартир в районе:')
     print(each_district_flats_amount)
-    print(n_rooms_flats_amount)
+
+    data.to_csv("edited.csv", index=False)
