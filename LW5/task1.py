@@ -1,10 +1,14 @@
 import random
-
 import numpy
 
 
-def start():
-    pass
+def start1():
+    x = 0.75
+    print(f"y = {calculate_expression(x)}")
+
+
+def start2():
+    calculate_regression_equation_estimation()
 
 
 def calculate_expression(x):
@@ -13,7 +17,7 @@ def calculate_expression(x):
             numpy.divide(
                 numpy.add(
                     numpy.sin(
-                        numpy.power(
+                        numpy.float_power(
                             numpy.subtract(
                                 numpy.divide(
                                     numpy.pi,
@@ -83,4 +87,3 @@ def calculate_regression_equation_estimation():
     print(a)
     print("Y' =")
     print(calculated_y)
-
