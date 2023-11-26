@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 class MenuWidget(QtWidgets.QWidget):
     def __init__(self, database, playQuizWidget, createQuizWidget, parent=None):
         super().__init__(parent)
+        self.database = database
         self.playQuizWidget = playQuizWidget
         self.createQuizWidget = createQuizWidget
 
@@ -18,10 +19,10 @@ class MenuWidget(QtWidgets.QWidget):
         createQuizPushButton.setDefault(True)
 
         def processPlayQuizPushButton():
-            self.playQuizWidget = PlayQuizWidget(database)
+            self.playQuizWidget = PlayQuizWidget(self.database)
 
         def processCreateQuizPushButton():
-            self.createQuizWidget = CreateQuizWidget(database)
+            self.createQuizWidget = CreateQuizWidget(self.database)
 
         playQuizPushButton.clicked.connect(processPlayQuizPushButton)
         createQuizPushButton.clicked.connect(processCreateQuizPushButton)
