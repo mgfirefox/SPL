@@ -9,8 +9,9 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     playQuidWidget = None
+    quizResultWidget = None
     createQuizWidget = None
-    menuWidget = widgets.MenuWidget(database, playQuidWidget, createQuizWidget)
+    menuWidget = widgets.MenuWidget(database, playQuidWidget, quizResultWidget, createQuizWidget)
 
     menuWidget.show()
     app.exec()
