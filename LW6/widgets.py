@@ -19,6 +19,16 @@ class MenuWidget(QtWidgets.QWidget):
         createQuizPushButton.setDefault(True)
 
         def processPlayQuizPushButton():
+            cursor = self.database.cursor()
+            cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'")
+            result = cursor.fetchone()
+            if result[0] == 0:
+                quizzesNotFoundMessageBox = QtWidgets.QMessageBox()
+                quizzesNotFoundMessageBox.setText("Викторины не найдены!")
+                quizzesNotFoundMessageBox.setWindowTitle(self.windowTitle())
+                quizzesNotFoundMessageBox.exec()
+                return
+
             self.playQuizWidget = PlayQuizWidget(self.database)
 
         def processCreateQuizPushButton():
@@ -26,9 +36,11 @@ class MenuWidget(QtWidgets.QWidget):
 
         playQuizPushButton.clicked.connect(processPlayQuizPushButton)
         createQuizPushButton.clicked.connect(processCreateQuizPushButton)
+
         menuLayout = QtWidgets.QVBoxLayout()
         menuLayout.addWidget(playQuizPushButton)
         menuLayout.addWidget(createQuizPushButton)
+
         self.setLayout(menuLayout)
 
 
@@ -42,7 +54,108 @@ class PlayQuizWidget(QtWidgets.QWidget):
         self.show()
 
     def initGui(self):
-        pass
+        quizNameLabel = QtWidgets.QLabel("Название викторины:")
+
+        quizNameLineEdit = QtWidgets.QLineEdit()
+        quizNameLineEdit.setPlaceholderText("Quiz")
+        quizNameLineEdit.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(r"^[a-zA-Z0-9 -]+")))
+
+        quizNamePushButton = QtWidgets.QPushButton("Играть")
+        quizNamePushButton.setDefault(True)
+
+        quizNameLayout = QtWidgets.QHBoxLayout()
+        quizNameLayout.addWidget(quizNameLabel)
+        quizNameLayout.addWidget(quizNameLineEdit)
+        quizNameLayout.addWidget(quizNamePushButton)
+
+        quizNameGroupBox = QtWidgets.QGroupBox()
+        quizNameGroupBox.setLayout(quizNameLayout)
+
+        questionLayout = QtWidgets.QGridLayout()
+
+        questionGroupBox = QtWidgets.QGroupBox()
+        questionGroupBox.setLayout(questionLayout)
+
+        def playQuiz(questions, answers, correctAnswers):
+            questionLabel = QtWidgets.QLabel(f"{1}. {questions[0][0]}")
+
+            questionButtonGroup = QtWidgets.QButtonGroup()
+
+            questionPushButton = QtWidgets.QPushButton("Продолжить")
+            questionPushButton.setDefault(True)
+
+            questionLayout.addWidget(questionLabel, 0, 0, QtCore.Qt.AlignCenter)
+            for i in range(1, 5):
+                questionRadioButton = QtWidgets.QRadioButton(answers[0][i - 1])
+
+                questionButtonGroup.addButton(questionRadioButton, i)
+                questionLayout.addWidget(questionRadioButton, i, 0)
+            questionButtonGroup.button(1).setChecked(True)
+            questionLayout.addWidget(questionPushButton, 5, 0, QtCore.Qt.AlignCenter)
+
+            userAnswers = []
+
+            def processQuestionPushButtonClick():
+                userAnswer = questionButtonGroup.checkedId()
+                if userAnswer == -1:
+                    # questionMessageBox = QtWidgets.QMessageBox()
+                    # questionMessageBox.setText("Выберите правильный вариант ответа!")
+                    # questionMessageBox.setWindowTitle(self.windowTitle())
+                    # questionMessageBox.exec()
+                    return
+                userAnswers.append(userAnswer)
+
+                currentQuestionNumber = len(userAnswers)
+
+                if currentQuestionNumber == len(questions):
+                    return
+
+                questionLabel.setText(f"{currentQuestionNumber + 1}. {questions[currentQuestionNumber][0]}")
+
+                for j in range(1, 5):
+                    questionButtonGroup.button(j).setText(answers[currentQuestionNumber][j - 1])
+                # questionButtonGroup.button(userAnswer).setChecked(False)
+
+            questionPushButton.clicked.connect(processQuestionPushButtonClick)
+
+        def processQuizNamePushButtonClick():
+            tableName = quizNameLineEdit.text()
+            if tableName == "":
+                tableName = quizNameLineEdit.placeholderText()
+
+            cursor = self.database.cursor()
+
+            cursor.execute(
+                f"SELECT name FROM sqlite_master WHERE type='table' and name={repr(tableName)}")
+            result = cursor.fetchone()
+            if result is None:
+                quizNotFoundMessageBox = QtWidgets.QMessageBox()
+                quizNotFoundMessageBox.setText(f"Викторина {tableName} не найдена!")
+                quizNotFoundMessageBox.setWindowTitle(self.windowTitle())
+                quizNotFoundMessageBox.exec()
+                return
+
+            quizNamePushButton.setEnabled(False)
+
+            cursor.execute(f"SELECT question FROM {repr(tableName)}")
+            questions = cursor.fetchall()
+
+            cursor.execute(f"SELECT answer1,answer2,answer3,answer4 FROM {repr(tableName)}")
+            answers = cursor.fetchall()
+
+            cursor.execute(f"SELECT correct_answer FROM {repr(tableName)}")
+            correctAnswers = cursor.fetchall()
+
+            questionGroupBox.setTitle(tableName)
+
+            playQuiz(questions, answers, correctAnswers)
+
+        quizNamePushButton.clicked.connect(processQuizNamePushButtonClick)
+
+        playQuizLayout = QtWidgets.QVBoxLayout()
+        playQuizLayout.addWidget(quizNameGroupBox)
+        playQuizLayout.addWidget(questionGroupBox)
+        self.setLayout(playQuizLayout)
 
 
 class CreateQuizWidget(QtWidgets.QWidget):
@@ -75,11 +188,13 @@ class CreateQuizWidget(QtWidgets.QWidget):
                 i += 1
 
         quizNameLabel = QtWidgets.QLabel("Название викторины:")
+
         quizNameLineEdit = QtWidgets.QLineEdit()
         quizNameLineEdit.setPlaceholderText(getDefaultQuizName())
         quizNameLineEdit.setValidator(QtGui.QRegularExpressionValidator(QtCore.QRegularExpression(r"^[a-zA-Z0-9 -]+")))
 
         questionsAmountLabel = QtWidgets.QLabel("Количество вопросов:")
+
         questionsAmountLineEdit = QtWidgets.QLineEdit()
         questionsAmountLineEdit.setPlaceholderText("от 1 до 99")
         questionsAmountLineEdit.setValidator(QtGui.QIntValidator(1, 99))
@@ -94,8 +209,8 @@ class CreateQuizWidget(QtWidgets.QWidget):
         quizDataLayout.addWidget(questionsAmountLineEdit, 1, 1)
         quizDataLayout.addWidget(quizDataPushButton, 1, 2)
 
-        questionsAmountGroupBox = QtWidgets.QGroupBox()
-        questionsAmountGroupBox.setLayout(quizDataLayout)
+        quizData = QtWidgets.QGroupBox()
+        quizData.setLayout(quizDataLayout)
 
         questionsDataLayout = QtWidgets.QVBoxLayout()
 
@@ -111,7 +226,7 @@ class CreateQuizWidget(QtWidgets.QWidget):
         answersDataLineEdits = []
         correctAnswersButtonGroups = []
 
-        createQuizPushButton = QtWidgets.QPushButton("Готово")
+        createQuizPushButton = QtWidgets.QPushButton("Создать")
         createQuizPushButton.setDefault(True)
         createQuizPushButton.setEnabled(False)
 
@@ -128,11 +243,12 @@ class CreateQuizWidget(QtWidgets.QWidget):
                     questionDataLayout.addWidget(QtWidgets.QLabel(f"Ответ №{j}:"), j, 0)
                     questionDataLayout.addWidget(answersDataLineEdits[questionNumber][j - 1], j, 1)
 
-                    correctAnswerRadioButton = QtWidgets.QRadioButton("")
+                    correctAnswerRadioButton = QtWidgets.QRadioButton()
                     correctAnswersButtonGroups[questionNumber].addButton(correctAnswerRadioButton, j)
                     questionDataLayout.addWidget(correctAnswerRadioButton, j, 2)
 
                 correctAnswersButtonGroups[questionNumber].button(1).setChecked(True)
+                correctAnswersButtonGroups[questionNumber].button(1).setChecked(False)
 
                 questionDataGroupBox = QtWidgets.QGroupBox()
                 questionDataGroupBox.setLayout(questionDataLayout)
@@ -140,6 +256,10 @@ class CreateQuizWidget(QtWidgets.QWidget):
                 return questionDataGroupBox
 
             if questionsAmountLineEdit.text() == "":
+                questionsAmountMessageBox = QtWidgets.QMessageBox()
+                questionsAmountMessageBox.setText("Введите количество вопросов в викторине!")
+                questionsAmountMessageBox.setWindowTitle(self.windowTitle())
+                questionsAmountMessageBox.exec()
                 return
             questionsAmountLineEdit.setText(questionsAmountLineEdit.text().lstrip("0"))
             questionsAmount = int(questionsAmountLineEdit.text())
@@ -191,13 +311,19 @@ class CreateQuizWidget(QtWidgets.QWidget):
                                 correctAnswersButtonGroups[i].checkedId()))
                 self.database.commit()
 
+            createQuizMessageBox = QtWidgets.QMessageBox()
+            createQuizMessageBox.setText(f"Викторина {tableName} успешно создана!")
+            createQuizMessageBox.setWindowTitle(self.windowTitle())
+            createQuizMessageBox.exec()
+
             self.close()
 
         quizDataPushButton.clicked.connect(processQuizDataPushButtonClick)
         createQuizPushButton.clicked.connect(processCreateQuizPushButtonClick)
 
         createQuizBoxLayout = QtWidgets.QVBoxLayout()
-        createQuizBoxLayout.addWidget(questionsAmountGroupBox)
+        createQuizBoxLayout.addWidget(quizData)
         createQuizBoxLayout.addWidget(questionsDataScrollArea)
         createQuizBoxLayout.addWidget(createQuizPushButton)
+
         self.setLayout(createQuizBoxLayout)
