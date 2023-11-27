@@ -106,17 +106,11 @@ def calculate_z(x,  y):
         numpy.add(
             numpy.float_power(
                 x,
-                numpy.divide(
-                    1,
-                    4
-                )
+                0.25
             ),
             numpy.float_power(
                 y,
-                numpy.divide(
-                    1,
-                    4
-                )
+                0.25
             )
         )
     )
