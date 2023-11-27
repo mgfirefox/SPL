@@ -2,10 +2,11 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 
 
 class MenuWidget(QtWidgets.QWidget):
-    def __init__(self, database, playQuizWidget, createQuizWidget, parent=None):
+    def __init__(self, database, playQuizWidget, quizResultWidget, createQuizWidget, parent=None):
         super().__init__(parent)
         self.database = database
         self.playQuizWidget = playQuizWidget
+        self.quizResultWidget = quizResultWidget
         self.createQuizWidget = createQuizWidget
 
         self.setWindowTitle("Quiz Game")
@@ -29,7 +30,7 @@ class MenuWidget(QtWidgets.QWidget):
                 quizzesNotFoundMessageBox.exec()
                 return
 
-            self.playQuizWidget = PlayQuizWidget(self.database)
+            self.playQuizWidget = PlayQuizWidget(self.database, self.quizResultWidget)
 
         def processCreateQuizPushButton():
             self.createQuizWidget = CreateQuizWidget(self.database)
@@ -45,9 +46,10 @@ class MenuWidget(QtWidgets.QWidget):
 
 
 class PlayQuizWidget(QtWidgets.QWidget):
-    def __init__(self, database, parent=None):
+    def __init__(self, database, quizResultWidget, parent=None):
         super().__init__(parent)
         self.database = database
+        self.quizResultWidget = quizResultWidget
 
         self.setWindowTitle("Викторина")
         self.initGui()
@@ -108,6 +110,8 @@ class PlayQuizWidget(QtWidgets.QWidget):
                 currentQuestionNumber = len(userAnswers)
 
                 if currentQuestionNumber == len(questions):
+                    self.quizResultWidget = QuizResultWidget(questions, answers, correctAnswers, userAnswers)
+                    self.close()
                     return
 
                 questionLabel.setText(f"{currentQuestionNumber + 1}. {questions[currentQuestionNumber][0]}")
@@ -156,6 +160,82 @@ class PlayQuizWidget(QtWidgets.QWidget):
         playQuizLayout.addWidget(quizNameGroupBox)
         playQuizLayout.addWidget(questionGroupBox)
         self.setLayout(playQuizLayout)
+
+
+class QuizResultWidget(QtWidgets.QWidget):
+    def __init__(self, questions, answers, correctAnswers, userAnswers, parent=None):
+        super().__init__(parent)
+        self.questions = questions
+        self.answers = answers
+        self.correctAnswers = correctAnswers
+        self.userAnswers = userAnswers
+
+        self.setWindowTitle("Результат викторины")
+        self.initGui()
+        self.show()
+
+    def initGui(self):
+        resultLabel = QtWidgets.QLabel()
+
+        resultPushButton = QtWidgets.QPushButton("Показать подробный результат")
+        resultPushButton.setDefault(True)
+
+        resultLayout = QtWidgets.QVBoxLayout()
+        resultLayout.addWidget(resultLabel, alignment=QtCore.Qt.AlignCenter)
+        resultLayout.addWidget(resultPushButton, alignment=QtCore.Qt.AlignCenter)
+
+        resultGroupBox = QtWidgets.QGroupBox()
+        resultGroupBox.setLayout(resultLayout)
+
+        detailedResultLayout = QtWidgets.QVBoxLayout()
+
+        detailedResultGroupBox = QtWidgets.QGroupBox()
+        detailedResultGroupBox.setLayout(detailedResultLayout)
+
+        detailedResultScrollArea = QtWidgets.QScrollArea()
+        detailedResultScrollArea.setWidget(detailedResultGroupBox)
+        detailedResultScrollArea.setWidgetResizable(True)
+        detailedResultScrollArea.setFixedHeight(600)
+
+        def processResultPushButton():
+            resultPushButton.setEnabled(False)
+
+            result = 0
+            questionsAmount = len(self.questions)
+
+            for i in range(questionsAmount):
+                answersLabels = []
+
+                detailedQuestionResultLayout = QtWidgets.QGridLayout()
+                detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Вопрос №{i + 1}:"), 0, 0)
+                detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(self.questions[i][0]), 0, 1, 1, 2)
+                for j in range(1, 5):
+                    answersLabels.append(QtWidgets.QLabel(self.answers[i][j - 1]))
+                    detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Ответ №{j}:"), j, 0)
+                    detailedQuestionResultLayout.addWidget(answersLabels[j - 1], j, 1)
+
+                if self.userAnswers[i] == self.correctAnswers[i][0]:
+                    answersLabels[self.userAnswers[i] - 1].setStyleSheet("QLabel { color: green }")
+                    answersLabels[self.userAnswers[i] - 1].setText(answersLabels[i].text() + " \u2705")
+
+                    result += 1
+                else:
+                    answersLabels[self.userAnswers[i] - 1].setStyleSheet("QLabel { color: red }")
+                    answersLabels[self.userAnswers[i] - 1].setText(answersLabels[i].text() + " \u274E")
+
+                resultLabel.setText(f"Ваш результат: {result}/{questionsAmount}")
+
+                detailedQuestionResultGroupBox = QtWidgets.QGroupBox()
+                detailedQuestionResultGroupBox.setLayout(detailedQuestionResultLayout)
+
+                detailedResultLayout.addWidget(detailedQuestionResultGroupBox)
+
+        resultPushButton.clicked.connect(processResultPushButton)
+
+        quizResultLayout = QtWidgets.QVBoxLayout()
+        quizResultLayout.addWidget(resultGroupBox)
+        quizResultLayout.addWidget(detailedResultScrollArea)
+        self.setLayout(quizResultLayout)
 
 
 class CreateQuizWidget(QtWidgets.QWidget):
@@ -248,7 +328,6 @@ class CreateQuizWidget(QtWidgets.QWidget):
                     questionDataLayout.addWidget(correctAnswerRadioButton, j, 2)
 
                 correctAnswersButtonGroups[questionNumber].button(1).setChecked(True)
-                correctAnswersButtonGroups[questionNumber].button(1).setChecked(False)
 
                 questionDataGroupBox = QtWidgets.QGroupBox()
                 questionDataGroupBox.setLayout(questionDataLayout)
