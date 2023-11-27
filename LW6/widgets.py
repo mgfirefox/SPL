@@ -190,45 +190,47 @@ class QuizResultWidget(QtWidgets.QWidget):
         detailedResultLayout = QtWidgets.QVBoxLayout()
 
         detailedResultGroupBox = QtWidgets.QGroupBox()
-        detailedResultGroupBox.setLayout(detailedResultLayout)
 
         detailedResultScrollArea = QtWidgets.QScrollArea()
         detailedResultScrollArea.setWidget(detailedResultGroupBox)
         detailedResultScrollArea.setWidgetResizable(True)
         detailedResultScrollArea.setFixedHeight(600)
 
+        result = 0
+        questionsAmount = len(self.questions)
+
+        for i in range(questionsAmount):
+            answersLabels = []
+
+            detailedQuestionResultLayout = QtWidgets.QGridLayout()
+            detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Вопрос №{i + 1}:"), 0, 0)
+            detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(self.questions[i][0]), 0, 1, 1, 2)
+            for j in range(1, 5):
+                answersLabels.append(QtWidgets.QLabel(self.answers[i][j - 1]))
+                detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Ответ №{j}:"), j, 0)
+                detailedQuestionResultLayout.addWidget(answersLabels[j - 1], j, 1)
+
+            userAnswer = self.userAnswers[i] - 1
+            if self.userAnswers[i] == self.correctAnswers[i][0]:
+                answersLabels[userAnswer].setStyleSheet("QLabel { color: green; font: bold; }")
+                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " \u2705")
+
+                result += 1
+            else:
+                answersLabels[userAnswer].setStyleSheet("QLabel { color: red; font: bold }")
+                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " \u274E")
+
+            resultLabel.setText(f"Ваш результат: {result}/{questionsAmount}")
+
+            detailedQuestionResultGroupBox = QtWidgets.QGroupBox()
+            detailedQuestionResultGroupBox.setLayout(detailedQuestionResultLayout)
+
+            detailedResultLayout.addWidget(detailedQuestionResultGroupBox)
+
         def processResultPushButton():
             resultPushButton.setEnabled(False)
 
-            result = 0
-            questionsAmount = len(self.questions)
-
-            for i in range(questionsAmount):
-                answersLabels = []
-
-                detailedQuestionResultLayout = QtWidgets.QGridLayout()
-                detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Вопрос №{i + 1}:"), 0, 0)
-                detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(self.questions[i][0]), 0, 1, 1, 2)
-                for j in range(1, 5):
-                    answersLabels.append(QtWidgets.QLabel(self.answers[i][j - 1]))
-                    detailedQuestionResultLayout.addWidget(QtWidgets.QLabel(f"Ответ №{j}:"), j, 0)
-                    detailedQuestionResultLayout.addWidget(answersLabels[j - 1], j, 1)
-
-                if self.userAnswers[i] == self.correctAnswers[i][0]:
-                    answersLabels[self.userAnswers[i] - 1].setStyleSheet("QLabel { color: green }")
-                    answersLabels[self.userAnswers[i] - 1].setText(answersLabels[i].text() + " \u2705")
-
-                    result += 1
-                else:
-                    answersLabels[self.userAnswers[i] - 1].setStyleSheet("QLabel { color: red }")
-                    answersLabels[self.userAnswers[i] - 1].setText(answersLabels[i].text() + " \u274E")
-
-                resultLabel.setText(f"Ваш результат: {result}/{questionsAmount}")
-
-                detailedQuestionResultGroupBox = QtWidgets.QGroupBox()
-                detailedQuestionResultGroupBox.setLayout(detailedQuestionResultLayout)
-
-                detailedResultLayout.addWidget(detailedQuestionResultGroupBox)
+            detailedResultGroupBox.setLayout(detailedResultLayout)
 
         resultPushButton.clicked.connect(processResultPushButton)
 
