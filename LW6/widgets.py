@@ -336,13 +336,14 @@ class CreateQuizWidget(QtWidgets.QWidget):
 
                 return questionDataGroupBox
 
-            if questionsAmountLineEdit.text() == "":
+            questionsAmountStr = questionsAmountLineEdit.text().lstrip("+").lstrip("0")
+            questionsAmountLineEdit.setText(questionsAmountStr)
+            if questionsAmountStr == "":
                 questionsAmountMessageBox = QtWidgets.QMessageBox()
                 questionsAmountMessageBox.setText("Введите количество вопросов в викторине!")
                 questionsAmountMessageBox.setWindowTitle(self.windowTitle())
                 questionsAmountMessageBox.exec()
                 return
-            questionsAmountLineEdit.setText(questionsAmountLineEdit.text().lstrip("0"))
             questionsAmount = int(questionsAmountLineEdit.text())
 
             if self.questionsAmount == 0:
