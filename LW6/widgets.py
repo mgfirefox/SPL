@@ -213,12 +213,12 @@ class QuizResultWidget(QtWidgets.QWidget):
             userAnswer = self.userAnswers[i] - 1
             if self.userAnswers[i] == self.correctAnswers[i][0]:
                 answersLabels[userAnswer].setStyleSheet("QLabel { color: green; font: bold; }")
-                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " \u2705")
+                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " ✅")
 
                 result += 1
             else:
                 answersLabels[userAnswer].setStyleSheet("QLabel { color: red; font: bold }")
-                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " \u274E")
+                answersLabels[userAnswer].setText(answersLabels[userAnswer].text() + " ❌")
 
             resultLabel.setText(f"Ваш результат: {result}/{questionsAmount}")
 
