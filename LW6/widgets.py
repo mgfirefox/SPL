@@ -19,7 +19,7 @@ class MenuWidget(QtWidgets.QWidget):
         createQuizPushButton = QtWidgets.QPushButton("Создать викторину")
         createQuizPushButton.setDefault(True)
 
-        def processPlayQuizPushButton():
+        def onPlayQuizPushButtonClicked():
             cursor = self.database.cursor()
             cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'")
             result = cursor.fetchone()
@@ -32,11 +32,11 @@ class MenuWidget(QtWidgets.QWidget):
 
             self.playQuizWidget = PlayQuizWidget(self.database, self.quizResultWidget)
 
-        def processCreateQuizPushButton():
+        def onCreateQuizPushButtonClicked():
             self.createQuizWidget = CreateQuizWidget(self.database)
 
-        playQuizPushButton.clicked.connect(processPlayQuizPushButton)
-        createQuizPushButton.clicked.connect(processCreateQuizPushButton)
+        playQuizPushButton.clicked.connect(onPlayQuizPushButtonClicked)
+        createQuizPushButton.clicked.connect(onCreateQuizPushButtonClicked)
 
         menuLayout = QtWidgets.QVBoxLayout()
         menuLayout.addWidget(playQuizPushButton)
@@ -97,7 +97,7 @@ class PlayQuizWidget(QtWidgets.QWidget):
 
             userAnswers = []
 
-            def processQuestionPushButtonClick():
+            def onQuestionPushButtonClicked():
                 userAnswer = questionButtonGroup.checkedId()
                 if userAnswer == -1:
                     # questionMessageBox = QtWidgets.QMessageBox()
@@ -120,9 +120,9 @@ class PlayQuizWidget(QtWidgets.QWidget):
                     questionButtonGroup.button(j).setText(answers[currentQuestionNumber][j - 1])
                 # questionButtonGroup.button(userAnswer).setChecked(False)
 
-            questionPushButton.clicked.connect(processQuestionPushButtonClick)
+            questionPushButton.clicked.connect(onQuestionPushButtonClicked)
 
-        def processQuizNamePushButtonClick():
+        def onQuizNamePushButtonClicked():
             tableName = quizNameLineEdit.text()
             if tableName == "":
                 tableName = quizNameLineEdit.placeholderText()
@@ -154,7 +154,7 @@ class PlayQuizWidget(QtWidgets.QWidget):
 
             playQuiz(questions, answers, correctAnswers)
 
-        quizNamePushButton.clicked.connect(processQuizNamePushButtonClick)
+        quizNamePushButton.clicked.connect(onQuizNamePushButtonClicked)
 
         playQuizLayout = QtWidgets.QVBoxLayout()
         playQuizLayout.addWidget(quizNameGroupBox)
@@ -227,12 +227,12 @@ class QuizResultWidget(QtWidgets.QWidget):
 
             detailedResultLayout.addWidget(detailedQuestionResultGroupBox)
 
-        def processResultPushButton():
+        def onResultPushButtonClicked():
             resultPushButton.setEnabled(False)
 
             detailedResultGroupBox.setLayout(detailedResultLayout)
 
-        resultPushButton.clicked.connect(processResultPushButton)
+        resultPushButton.clicked.connect(onResultPushButtonClicked)
 
         quizResultLayout = QtWidgets.QVBoxLayout()
         quizResultLayout.addWidget(resultGroupBox)
@@ -312,7 +312,7 @@ class CreateQuizWidget(QtWidgets.QWidget):
         createQuizPushButton.setDefault(True)
         createQuizPushButton.setEnabled(False)
 
-        def processQuizDataPushButtonClick():
+        def onQuizDataPushButtonClicked():
             def createQuestionDataGroupBox(questionNumber):
                 questionsDataLineEdits.append(QtWidgets.QLineEdit())
                 answersDataLineEdits.append(tuple(QtWidgets.QLineEdit() for _ in range(4)))
@@ -365,7 +365,7 @@ class CreateQuizWidget(QtWidgets.QWidget):
 
                 self.questionsAmount = questionsAmount
 
-        def processCreateQuizPushButtonClick():
+        def onCreateQuizPushButtonClicked():
             tableName = quizNameLineEdit.text()
             if tableName == "":
                 tableName = quizNameLineEdit.placeholderText()
@@ -400,8 +400,8 @@ class CreateQuizWidget(QtWidgets.QWidget):
 
             self.close()
 
-        quizDataPushButton.clicked.connect(processQuizDataPushButtonClick)
-        createQuizPushButton.clicked.connect(processCreateQuizPushButtonClick)
+        quizDataPushButton.clicked.connect(onQuizDataPushButtonClicked)
+        createQuizPushButton.clicked.connect(onCreateQuizPushButtonClicked)
 
         createQuizBoxLayout = QtWidgets.QVBoxLayout()
         createQuizBoxLayout.addWidget(quizData)
